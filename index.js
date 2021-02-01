@@ -140,17 +140,17 @@ app.get("/validate", async function (req, res) {
   }
 });
 
-app.put("/reset/:type/:email", async function (req, res) {
+app.put("/reset/:type/:id", async function (req, res) {
   try {
     var client = await mongoClient.connect(url);
     var db = client.db("react-login");
     var user;
     if (req.params.type === "A")
-      user = await db.collection("admins").findOne({ Email: req.params.email });
+      user = await db.collection("admins").findOne({ _id: mongodb.ObjectID(req.body.Id) });
     if (req.params.type === "M")
-      user = await db.collection("managers").findOne({ Email: req.params.email });
+      user = await db.collection("managers").findOne({ _id: mongodb.ObjectID(req.body.Id) });
     if (req.params.type === "E")
-      user = await db.collection("employees").findOne({ Email: req.params.email });
+      user = await db.collection("employees").findOne({ _id: mongodb.ObjectID(req.body.Id) });
     if (user) {
       //generate salt
       let salt = await bcryptjs.genSalt(10);
@@ -161,7 +161,7 @@ app.put("/reset/:type/:email", async function (req, res) {
       if (req.params.Type === "A")
         await db.collection("admins")
           .findOneAndUpdate(
-            { Email: req.params.email },
+            { _id: req.params.id },
             {
               $set: {
                 Password: req.body.new_password
@@ -171,7 +171,7 @@ app.put("/reset/:type/:email", async function (req, res) {
       if (req.params.Type === "M")
         await db.collection("mangers")
           .findOneAndUpdate(
-            { Email: req.params.email },
+            { _id: req.params.id },
             {
               $set: {
                 Password: req.body.new_password
@@ -181,7 +181,7 @@ app.put("/reset/:type/:email", async function (req, res) {
       if (req.params.Type === "E")
         await db.collection("employees")
           .findOneAndUpdate(
-            { Email: req.params.email },
+            { _id: req.params.id },
             {
               $set: {
                 Password: req.body.new_password
